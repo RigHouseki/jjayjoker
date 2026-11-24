@@ -29,9 +29,9 @@
         }
 
         h1 {
-            font-size: clamp(32px, 6vw, 72px);
+            font-size: clamp(28px, 6vw, 72px);
             letter-spacing: 8px;
-            margin-bottom: 15px;
+            margin: 0 0 20px;
             text-align: center;
         }
 
@@ -46,6 +46,7 @@
             width: 100%;
             max-width: 900px;
             aspect-ratio: 16 / 9;
+            background: #000;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 20px 80px #0008;
@@ -53,9 +54,25 @@
         }
 
         iframe {
+            display: block;
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .youtube-button {
+            margin-top: 25px;
+            padding: 12px 24px;
+            background: #b83939;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .youtube-button:hover {
+            background: #e04444;
         }
 
         footer {
@@ -70,17 +87,25 @@
 <body>
 
     <h1>JJAYJOKER</h1>
+
     <div class="line"></div>
 
     <div class="video">
         <iframe
-            src="https://www.youtube.com/watch?v=fAlD0QLE76U"
-            title="YouTube video player"
+            src="https://www.youtube-nocookie.com/embed/fAlD0QLE76U"
+            title="JJayJoker"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen>
         </iframe>
     </div>
+
+    <a class="youtube-button"
+       href="https://www.youtube.com/watch?v=fAlD0QLE76U"
+       target="_blank"
+       rel="noopener noreferrer">
+        Obejrzyj na YouTube
+    </a>
 
     <footer>JJAYJOKER.PL — 2026</footer>
 
