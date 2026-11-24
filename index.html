@@ -1,63 +1,87 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JJayJoker.pl</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JJAYJOKER.PL</title>
 
-    body {
-      background-color: #0f0f0f;
-      color: #ffffff;
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    h1 {
-      margin-bottom: 24px;
-      font-size: 2rem;
-      letter-spacing: 1px;
-    }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(
+                ellipse at center,
+                #261518,
+                #0b0b0d 75%
+            );
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
 
-    .video-container {
-      width: 100%;
-      max-width: 800px;
-      aspect-ratio: 16 / 9;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    }
+        h1 {
+            font-size: clamp(32px, 6vw, 72px);
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+        .line {
+            width: 60px;
+            height: 3px;
+            background: #b83939;
+            margin-bottom: 40px;
+        }
+
+        .video {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 80px #0008;
+            border: 1px solid #333;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        footer {
+            margin-top: 35px;
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 3px;
+        }
+    </style>
 </head>
+
 <body>
 
-  <h1>JJAYJOKER.PL</h1>
+    <h1>JJAYJOKER</h1>
+    <div class="line"></div>
 
-  <div class="video-container">
-    <iframe 
-      src="https://youtube.com" 
-      title="JJayJoker nie żyje..." 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-      allowfullscreen>
-    </iframe>
-  </div>
+    <div class="video">
+        <iframe
+            src="https://www.youtube.com/embed/ID_FILMU"
+            title="YouTube video player"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <footer>JJAYJOKER.PL — 2026</footer>
 
 </body>
 </html>
