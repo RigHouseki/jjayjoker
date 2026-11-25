@@ -28,7 +28,6 @@
             font-family: Georgia, serif;
         }
 
-
         .memorial {
             position: fixed;
             inset: 0;
@@ -41,7 +40,6 @@
             pointer-events: none;
             animation: memorialFade 7s ease forwards;
         }
-
 
         .video {
             width: 90%;
@@ -58,7 +56,6 @@
             height: 100%;
             border: none;
         }
-
 
         @keyframes memorialFade {
             0% {
@@ -88,7 +85,6 @@
             }
         }
 
-
         .secret-trigger {
             position: fixed;
             bottom: 0;
@@ -101,7 +97,6 @@
             padding: 0;
             touch-action: manipulation;
         }
-
 
         .easter-egg {
             position: fixed;
@@ -140,7 +135,6 @@
             transform: scale(1);
         }
 
-
         @media (prefers-reduced-motion: reduce) {
             .memorial {
                 display: none;
@@ -166,7 +160,7 @@
 
     <div class="video">
         <iframe
-            src="https://www.youtube-nocookie.com/embed/fAlD0QLE76U?rel=0"
+            id="youtubePlayer"
             title="JJayJoker"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
@@ -182,16 +176,24 @@
         aria-label="azirkabo">
     </button>
 
-
     <div class="easter-egg" id="easterEgg">
         <img src="./x0sh4zx.jpg" alt="azirka">
     </div>
 
     <script>
+        const youtubePlayer = document.getElementById("youtubePlayer");
         const easterEgg = document.getElementById("easterEgg");
         const secretTrigger = document.getElementById("secretTrigger");
 
         const secretCode = "azirka";
+
+        const reducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        setTimeout(() => {
+            youtubePlayer.src = "https://www.youtube-nocookie.com/embed/fAlD0QLE76U?rel=0&autoplay=1&mute=1&playsinline=1";
+        }, reducedMotion ? 0 : 6000);
 
         let clicks = 0;
         let clickTimer;
@@ -204,7 +206,6 @@
         function hideEasterEgg() {
             easterEgg.classList.remove("active");
         }
-
 
         secretTrigger.addEventListener("click", () => {
             clicks++;
@@ -222,10 +223,7 @@
             }
         });
 
-        // wpisz azirka
-
         document.addEventListener("keydown", (event) => {
-
             if (event.key === "Escape") {
                 hideEasterEgg();
                 typed = "";
@@ -242,7 +240,6 @@
                 }
             }
         });
-
 
         easterEgg.addEventListener("click", () => {
             hideEasterEgg();
