@@ -534,7 +534,7 @@
             }
         }
 
-        #ferretVideo {
+        #fredVideo {
             position: fixed;
             width: 1px;
             height: 1px;
@@ -542,7 +542,7 @@
             pointer-events: none;
         }
 
-        #ferretCanvas {
+        #fredCanvas {
             position: fixed;
             inset: 0;
             width: 100vw;
@@ -554,32 +554,32 @@
             transition: opacity .5s;
         }
 
-        #ferretCanvas.active {
+        #fredCanvas.active {
             opacity: 1;
         }
 
-        #ferretHat {
+        #fredHat {
             position: absolute;
-            right: calc(100% - 24px);
-            top: 0;
-            width: clamp(100px, 15vw, 200px);
+            left: -85px;
+            top: -100px;
+            width: clamp(150px, 17vw, 250px);
             aspect-ratio: 4 / 3;
             z-index: 45;
             display: none;
             pointer-events: none;
         }
 
-        #ferretHat.active {
+        #fredHat.active {
             display: block;
         }
 
-        #ferretHat img {
+        #fredHat img {
             display: block;
             width: 100%;
             height: 100%;
         }
 
-        #ferretPin {
+        #fredPin {
             position: absolute;
             left: 40.8%;
             top: 52.8%;
@@ -594,16 +594,16 @@
             padding: 0;
         }
 
-        #ferretPin:hover,
-        #ferretPin:focus-visible {
+        #fredPin:hover,
+        #fredPin:focus-visible {
             box-shadow: 0 0 12px white;
         }
 
         @media (max-width: 1250px) {
-            #ferretHat {
-                right: auto;
-                left: -12px;
+            #fredHat {
+                left: -20px;
                 top: -75px;
+                width: 160px;
             }
         }
 
@@ -665,12 +665,12 @@
             </iframe>
         </div>
 
-        <div id="ferretHat">
+        <div id="fredHat">
             <img src="./czapka.png" alt="Kapelusz">
 
             <button
-                id="ferretPin"
-                aria-label="Fretki"
+                id="fredPin"
+                aria-label="Fred"
                 aria-pressed="false">
             </button>
         </div>
@@ -709,7 +709,7 @@
     </audio>
 
     <video
-        id="ferretVideo"
+        id="fredVideo"
         src="./fred.mp4"
         loop
         playsinline
@@ -718,7 +718,7 @@
     </video>
 
     <canvas
-        id="ferretCanvas"
+        id="fredCanvas"
         aria-hidden="true">
     </canvas>
 
@@ -855,17 +855,17 @@
             ].map(n => String(n).padStart(2, "0")).join(":");
         }
 
-        const ferretVideo = document.getElementById("ferretVideo");
-        const ferretCanvas = document.getElementById("ferretCanvas");
-        const ferretHat = document.getElementById("ferretHat");
-        const ferretPin = document.getElementById("ferretPin");
+        const fredVideo = document.getElementById("fredVideo");
+        const fredCanvas = document.getElementById("fredCanvas");
+        const fredHat = document.getElementById("fredHat");
+        const fredPin = document.getElementById("fredPin");
 
-        const ferretContext = ferretCanvas.getContext("2d", {
+        const fredContext = fredCanvas.getContext("2d", {
             willReadFrequently: true
         });
 
-        let ferretsOn = false;
-        let ferretGeneration = 0;
+        let fredOn = false;
+        let fredGeneration = 0;
         let youtubeMutedBefore = false;
         let youtubeMuted = false;
 
@@ -909,28 +909,28 @@
             );
         });
 
-        function renderFerrets(generation) {
+        function renderFred(generation) {
             if (
-                !ferretsOn ||
-                generation !== ferretGeneration
+                !fredOn ||
+                generation !== fredGeneration
             ) {
                 return;
             }
 
-            if (ferretVideo.readyState >= 2) {
-                ferretContext.drawImage(
-                    ferretVideo,
+            if (fredVideo.readyState >= 2) {
+                fredContext.drawImage(
+                    fredVideo,
                     0,
                     0,
-                    ferretCanvas.width,
-                    ferretCanvas.height
+                    fredCanvas.width,
+                    fredCanvas.height
                 );
 
-                const frame = ferretContext.getImageData(
+                const frame = fredContext.getImageData(
                     0,
                     0,
-                    ferretCanvas.width,
-                    ferretCanvas.height
+                    fredCanvas.width,
+                    fredCanvas.height
                 );
 
                 const pixels = frame.data;
@@ -973,35 +973,35 @@
                     }
                 }
 
-                ferretContext.putImageData(frame, 0, 0);
+                fredContext.putImageData(frame, 0, 0);
 
-                ferretCanvas.classList.add("active");
+                fredCanvas.classList.add("active");
             }
 
-            if ("requestVideoFrameCallback" in ferretVideo) {
-                ferretVideo.requestVideoFrameCallback(() => {
-                    renderFerrets(generation);
+            if ("requestVideoFrameCallback" in fredVideo) {
+                fredVideo.requestVideoFrameCallback(() => {
+                    renderFred(generation);
                 });
             } else {
                 requestAnimationFrame(() => {
-                    renderFerrets(generation);
+                    renderFred(generation);
                 });
             }
         }
 
-        ferretPin.addEventListener("click", async () => {
-            ferretsOn = !ferretsOn;
+        fredPin.addEventListener("click", async () => {
+            fredOn = !fredOn;
 
-            const generation = ++ferretGeneration;
+            const generation = ++fredGeneration;
 
-            ferretPin.setAttribute(
+            fredPin.setAttribute(
                 "aria-pressed",
-                String(ferretsOn)
+                String(fredOn)
             );
 
-            if (!ferretsOn) {
-                ferretCanvas.classList.remove("active");
-                ferretVideo.pause();
+            if (!fredOn) {
+                fredCanvas.classList.remove("active");
+                fredVideo.pause();
 
                 if (!youtubeMutedBefore) {
                     youtubeCommand("unMute");
@@ -1015,52 +1015,53 @@
 
                 youtubeCommand("mute");
 
-                ferretVideo.muted = false;
-                ferretVideo.volume = 1;
+                fredVideo.muted = false;
+                fredVideo.volume = 1;
 
-                await ferretVideo.play();
+                await fredVideo.play();
 
                 if (
-                    !ferretsOn ||
-                    generation !== ferretGeneration
+                    !fredOn ||
+                    generation !== fredGeneration
                 ) {
                     return;
                 }
 
                 const scale = Math.min(
                     1,
-                    1280 / ferretVideo.videoWidth
+                    1280 / fredVideo.videoWidth
                 );
 
-                ferretCanvas.width = Math.max(
+                fredCanvas.width = Math.max(
                     1,
-                    Math.round(ferretVideo.videoWidth * scale)
+                    Math.round(fredVideo.videoWidth * scale)
                 );
 
-                ferretCanvas.height = Math.max(
+                fredCanvas.height = Math.max(
                     1,
-                    Math.round(ferretVideo.videoHeight * scale)
+                    Math.round(fredVideo.videoHeight * scale)
                 );
 
-                renderFerrets(generation);
+                renderFred(generation);
 
             } catch (error) {
-                if (generation !== ferretGeneration) return;
+                if (generation !== fredGeneration) return;
 
-                ferretsOn = false;
+                fredOn = false;
 
-                ferretVideo.pause();
+                fredVideo.pause();
+                fredCanvas.classList.remove("active");
 
                 if (!youtubeMutedBefore) {
                     youtubeCommand("unMute");
                 }
 
-                ferretPin.setAttribute(
+                fredPin.setAttribute(
                     "aria-pressed",
                     "false"
                 );
 
-                console.warn("Ferret video:", error);
+                console.warn("Fred video:", error);
             }
         });
 
@@ -1068,7 +1069,7 @@
             updateCountdown();
 
             countdown.classList.add("active");
-            ferretHat.classList.add("active");
+            fredHat.classList.add("active");
         }
 
         updateCountdown();
