@@ -541,7 +541,7 @@
             opacity: 0;
             pointer-events: none;
         }
-
+        
         #fredCanvas {
             position: fixed;
             inset: 0;
@@ -551,7 +551,7 @@
             z-index: 40;
             pointer-events: none;
             opacity: 0;
-            transition: opacity .5s;
+            transition: opacity 0.5s ease;
         }
 
         #fredCanvas.active {
@@ -586,7 +586,7 @@
             transform: translate(-50%, -50%);
             width: 9%;
             aspect-ratio: 1;
-            border: 0;
+            border: none;
             border-radius: 50%;
             background: transparent;
             cursor: pointer;
@@ -597,6 +597,47 @@
         #fredPin:hover,
         #fredPin:focus-visible {
             box-shadow: 0 0 12px white;
+        }
+
+        #sobieskiPin {
+            position: absolute;
+            left: 33.3%;
+            top: 53.9%;
+            transform: translate(-50%, -50%);
+            width: 7%;
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            pointer-events: auto;
+            padding: 0;
+        }
+
+        #sobieskiPin:hover,
+        #sobieskiPin:focus-visible {
+            box-shadow: 0 0 12px yellow;
+        }
+
+        #sobieskiVideo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            z-index: 30;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.5s ease,
+                        visibility 0.5s;
+        }
+
+        #sobieskiVideo.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
         @media (max-width: 1250px) {
@@ -642,10 +683,245 @@
 
             .easter-egg,
             .easter-egg img,
-            .countdown {
+            .countdown,
+            #fredCanvas,
+            #sobieskiVideo {
                 transition: none;
             }
         }
+        #lyricsContainer {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 42;
+}
+
+.lyric-word {
+    position: absolute;
+    color: white;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    white-space: nowrap;
+    text-shadow:
+        0 0 15px rgba(255, 255, 255, 0.4),
+        0 0 30px rgba(0, 0, 0, 0.9),
+        2px 2px 8px black;
+
+    animation: lyricAppear 1.8s ease forwards;
+}
+
+@keyframes lyricAppear {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%)
+                   scale(0.5)
+                   rotate(var(--rotation));
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -65%)
+                   scale(1.5)
+                   rotate(var(--rotation));
+    }
+}
+    
+        #timeCrack {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 54;
+            pointer-events: none;
+            opacity: 0;
+        }
+        #timeCrack.active { animation: crackFade 2.8s ease-out forwards; }
+        #countdown.frozen { animation: clockImpact .45s ease-out; text-shadow: 0 0 12px #aaa; }
+        @keyframes crackFade {
+            0% { opacity: 1; background: rgba(255,255,255,.25); }
+            12% { opacity: 1; background: transparent; }
+            55% { opacity: .8; }
+            100% { opacity: 0; }
+        }
+        @keyframes clockImpact {
+            0%,100% { transform: none; }
+            20% { transform: translateX(-4px) scale(1.08); }
+            45% { transform: translateX(3px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #timeCrack.active, #countdown.frozen { animation: none; }
+        }
+
+         {
+            position: absolute;
+            inset: 0;
+            z-index: 35;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .8s ease;
+            background: radial-gradient(ellipse at 50% 48%, transparent 25%, rgba(0,0,0,.25) 60%, rgba(0,0,0,.72) 100%);
+        }
+        #stageLights {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 35;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+#stageLights.active {
+    opacity: 1;
+    animation: stageIgnition 0.65s ease-out forwards;
+}
+
+#sobieskiVideo {
+    transition:
+        opacity 0.5s ease,
+        visibility 0.5s,
+        filter 0.4s ease;
+}
+
+#sobieskiVideo.stage-lit {
+    filter: brightness(1.22);
+}
+
+.stage-beam {
+    position: absolute;
+    top: -5vh;
+    width: 48vw;
+    height: 145vh;
+
+    transform-origin: 50% 0%;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.25) 45%,
+        rgba(255, 255, 255, 0.08) 75%,
+        transparent 100%
+    );
+
+    clip-path: polygon(
+        45% 0%,
+        55% 0%,
+        100% 100%,
+        0% 100%
+    );
+
+    mix-blend-mode: screen;
+}
+
+.beam-one {
+    left: 13%;
+    transform: rotate(-18deg);
+}
+
+.beam-two {
+    left: 39%;
+    transform: rotate(18deg);
+}
+
+.beam-three {
+    left: -20%;
+    transform: rotate(-48deg);
+}
+
+.beam-four {
+    left: 72%;
+    transform: rotate(48deg);
+}
+
+#stageLights.active .beam-one {
+    animation: beamSweepOne 2s ease-in-out infinite alternate;
+}
+
+#stageLights.active .beam-two {
+    animation: beamSweepTwo 2.3s ease-in-out infinite alternate;
+}
+
+#stageLights.active .beam-three {
+    animation: beamSweepThree 2.6s ease-in-out infinite alternate;
+}
+
+#stageLights.active .beam-four {
+    animation: beamSweepFour 2.1s ease-in-out infinite alternate;
+}
+
+@keyframes beamSweepOne {
+    from {
+        transform: rotate(-25deg);
+    }
+    to {
+        transform: rotate(-5deg);
+    }
+}
+
+@keyframes beamSweepTwo {
+    from {
+        transform: rotate(25deg);
+    }
+    to {
+        transform: rotate(5deg);
+    }
+}
+
+@keyframes beamSweepThree {
+    from {
+        transform: rotate(-55deg);
+    }
+    to {
+        transform: rotate(-35deg);
+    }
+}
+
+@keyframes beamSweepFour {
+    from {
+        transform: rotate(55deg);
+    }
+    to {
+        transform: rotate(35deg);
+    }
+}
+
+@keyframes stageIgnition {
+    0% {
+        opacity: 0;
+        filter: brightness(1);
+    }
+
+    20% {
+        opacity: 1;
+        filter: brightness(1.8);
+    }
+
+    45% {
+        opacity: 0.45;
+        filter: brightness(1);
+    }
+
+    100% {
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #stageLights.active,
+    #stageLights.active .stage-beam {
+        animation: none;
+    }
+}
     </style>
 </head>
 
@@ -665,7 +941,22 @@
             </iframe>
         </div>
 
+        <video
+            id="sobieskiVideo"
+            src="./sobieskijjay.mp4"
+            playsinline
+            preload="metadata">
+        </video>
+
+        <div id="stageLights" aria-hidden="true">
+        <div class="stage-beam beam-one"></div>
+        <div class="stage-beam beam-two"></div>
+        <div class="stage-beam beam-three"></div>
+        <div class="stage-beam beam-four"></div>
+        </div>
+
         <div id="fredHat">
+
             <img src="./czapka.png" alt="Kapelusz">
 
             <button
@@ -673,6 +964,13 @@
                 aria-label="Fred"
                 aria-pressed="false">
             </button>
+
+            <button
+                id="sobieskiPin"
+                aria-label="Sobieski"
+                aria-pressed="false">
+            </button>
+
         </div>
 
         <div class="countdown" id="countdown">
@@ -690,10 +988,15 @@
         <div class="glitch-bar bar-three"></div>
     </div>
 
-    <div class="bell-resonance" id="bellResonance" aria-hidden="true">
+    <div
+        class="bell-resonance"
+        id="bellResonance"
+        aria-hidden="true">
+
         <div class="bell-wave"></div>
         <div class="bell-wave"></div>
         <div class="bell-wave"></div>
+
     </div>
 
     <button
@@ -716,6 +1019,9 @@
         preload="metadata"
         aria-hidden="true">
     </video>
+
+    <div id="lyricsContainer" aria-hidden="true"></div>
+    <canvas id="timeCrack" aria-hidden="true"></canvas>
 
     <canvas
         id="fredCanvas"
@@ -775,9 +1081,11 @@
                 }
 
                 glitchSound.muted = false;
+
             }).catch(() => {
                 glitchSound.muted = false;
             });
+
         }, { once: true });
 
         const reducedMotion = window.matchMedia(
@@ -793,6 +1101,7 @@
 
         let bellTimer;
         let lastHour = null;
+        let timeFrozen = false;
 
         function ringBell() {
             bellSound.pause();
@@ -821,6 +1130,7 @@
         bellTrigger.addEventListener("click", ringBell);
 
         function updateCountdown() {
+            if (timeFrozen) return;
             const remaining = Math.max(
                 0,
                 targetDate - Date.now()
@@ -860,12 +1170,16 @@
         const fredHat = document.getElementById("fredHat");
         const fredPin = document.getElementById("fredPin");
 
+        const sobieskiPin = document.getElementById("sobieskiPin");
+        const sobieskiVideo = document.getElementById("sobieskiVideo");
+
         const fredContext = fredCanvas.getContext("2d", {
             willReadFrequently: true
         });
 
-        let fredOn = false;
-        let fredGeneration = 0;
+        let activeEasterEgg = null;
+        let playbackGeneration = 0;
+
         let youtubeMutedBefore = false;
         let youtubeMuted = false;
 
@@ -896,6 +1210,7 @@
                 if (typeof data?.info?.muted === "boolean") {
                     youtubeMuted = data.info.muted;
                 }
+
             } catch (_) {}
         });
 
@@ -909,10 +1224,34 @@
             );
         });
 
+        function stopEasterEgg(restoreYoutube = true) {
+            const wasActive = activeEasterEgg !== null;
+            if (activeEasterEgg === "sobieski") resumeTime();
+
+            playbackGeneration++;
+
+            activeEasterEgg = null;
+
+            fredVideo.pause();
+            fredCanvas.classList.remove("active");
+
+            sobieskiVideo.pause();
+            sobieskiVideo.classList.remove("active");
+
+            fredPin.setAttribute("aria-pressed", "false");
+            sobieskiPin.setAttribute("aria-pressed", "false");
+
+            if (restoreYoutube && wasActive) {
+                youtubeCommand(
+                    youtubeMutedBefore ? "mute" : "unMute"
+                );
+            }
+        }
+
         function renderFred(generation) {
             if (
-                !fredOn ||
-                generation !== fredGeneration
+                activeEasterEgg !== "fred" ||
+                generation !== playbackGeneration
             ) {
                 return;
             }
@@ -982,6 +1321,7 @@
                 fredVideo.requestVideoFrameCallback(() => {
                     renderFred(generation);
                 });
+
             } else {
                 requestAnimationFrame(() => {
                     renderFred(generation);
@@ -989,80 +1329,100 @@
             }
         }
 
-        fredPin.addEventListener("click", async () => {
-            fredOn = !fredOn;
-
-            const generation = ++fredGeneration;
-
-            fredPin.setAttribute(
-                "aria-pressed",
-                String(fredOn)
-            );
-
-            if (!fredOn) {
-                fredCanvas.classList.remove("active");
-                fredVideo.pause();
-
-                if (!youtubeMutedBefore) {
-                    youtubeCommand("unMute");
-                }
-
+        async function toggleEasterEgg(type) {
+            if (activeEasterEgg === type) {
+                stopEasterEgg();
                 return;
             }
 
-            try {
+            if (activeEasterEgg === null) {
                 youtubeMutedBefore = youtubeMuted;
+            }
 
-                youtubeCommand("mute");
+            stopEasterEgg(false);
 
-                fredVideo.muted = false;
-                fredVideo.volume = 1;
+            activeEasterEgg = type;
 
-                await fredVideo.play();
+            const generation = ++playbackGeneration;
 
-                if (
-                    !fredOn ||
-                    generation !== fredGeneration
-                ) {
+            youtubeCommand("mute");
+
+            try {
+                if (type === "fred") {
+                    fredPin.setAttribute(
+                        "aria-pressed",
+                        "true"
+                    );
+
+                    fredVideo.muted = false;
+                    fredVideo.volume = 1;
+
+                    await fredVideo.play();
+
+                    if (
+                        activeEasterEgg !== "fred" ||
+                        generation !== playbackGeneration
+                    ) {
+                        return;
+                    }
+
+                    const scale = Math.min(
+                        1,
+                        1280 / fredVideo.videoWidth
+                    );
+
+                    fredCanvas.width = Math.max(
+                        1,
+                        Math.round(fredVideo.videoWidth * scale)
+                    );
+
+                    fredCanvas.height = Math.max(
+                        1,
+                        Math.round(fredVideo.videoHeight * scale)
+                    );
+
+                    renderFred(generation);
+                }
+
+                if (type === "sobieski") {
+                    sobieskiPin.setAttribute(
+                        "aria-pressed",
+                        "true"
+                    );
+
+                    sobieskiVideo.muted = false;
+                    sobieskiVideo.volume = 1;
+                    sobieskiVideo.currentTime = 0;
+
+                    await sobieskiVideo.play();
+
+                    if (
+                        activeEasterEgg !== "sobieski" ||
+                        generation !== playbackGeneration
+                    ) {
+                        return;
+                    }
+
+                    sobieskiVideo.classList.add("active");
+                }
+
+            } catch (error) {
+                if (generation !== playbackGeneration) {
                     return;
                 }
 
-                const scale = Math.min(
-                    1,
-                    1280 / fredVideo.videoWidth
-                );
+                stopEasterEgg();
 
-                fredCanvas.width = Math.max(
-                    1,
-                    Math.round(fredVideo.videoWidth * scale)
-                );
-
-                fredCanvas.height = Math.max(
-                    1,
-                    Math.round(fredVideo.videoHeight * scale)
-                );
-
-                renderFred(generation);
-
-            } catch (error) {
-                if (generation !== fredGeneration) return;
-
-                fredOn = false;
-
-                fredVideo.pause();
-                fredCanvas.classList.remove("active");
-
-                if (!youtubeMutedBefore) {
-                    youtubeCommand("unMute");
-                }
-
-                fredPin.setAttribute(
-                    "aria-pressed",
-                    "false"
-                );
-
-                console.warn("Fred video:", error);
+                console.warn("Video playback:", error);
             }
+        }
+
+        fredPin.addEventListener("click", () => {
+            toggleEasterEgg("fred");
+        });
+
+        sobieskiPin.addEventListener("click", () => {
+            toggleEasterEgg("sobieski");
         });
 
         function showCountdown() {
@@ -1179,9 +1539,10 @@
             }
         });
 
-        document.addEventListener("keydown", (event) => {
+        document.addEventListener("keydown", event => {
             if (event.key === "Escape") {
                 hideEasterEgg();
+                stopEasterEgg();
 
                 typed = "";
 
@@ -1204,6 +1565,242 @@
         easterEgg.addEventListener("click", () => {
             hideEasterEgg();
         });
+
+        const lyricsContainer = document.getElementById("lyricsContainer");
+
+const lyrics = [
+    [3.5, "Sobieski i JJay razem znów,"],
+    [6.0, "Tym razem w krainie snów."],
+
+    [8.0, "Tak więc posłuchajcie teraz historii."],
+    [11.0, "Jako dziecko błądziłem w pytań mgle,"],
+    [13.0, "Zastanawiając się"],
+    [15.0, "Czemu pada śnieg?"],
+    [16.0, "Czemu życie jest złe?"],
+    [17.5, "Czemu wszystko jest inne we śnie?"],
+    [19.0, "I kto tu jest oprócz mnie?!"],
+
+    [22.0, "W krainie snów znów się zanurzam."],
+    [24.0, "Jak Hemingway chcę śnić o podróżach."],
+    [27.0, "To świat Morfeusza,"],
+    [28.0, "Iluzja jak diuna,"],
+    [29.0, "Ale tutaj mam moc,"],
+    [30.0, "Gdy noc mnie otula."],
+
+    [32.0, "Teraz zatrzymajmy czas,"],
+    [34.0, "Jeszcze raz."],
+    [35.0, "Trąćmy jedną z gwiazd,"],
+    [36.0, "Niech jej blask olśni wiarę w świat"],
+    [38.0, "Bez barier."],
+    [39.5, "A więc słuchaj mnie młody padawanie,"],
+    [41.0, "Nigdy nie rezygnuj z marzeń"],
+    [42.0, "Amen."],
+
+    [42.5, "Wokół ból i strach,"],
+    [44.0, "Więc nie stójmy tak."],
+    [46.0, "Ratujmy co się da"],
+    [47.0, "I zbudujmy nowy świat,"],
+    [48.5, "Lepszy świat,"],
+    [49.5, "Świat bez zła,"],
+    [51.0, "Jak w Minecraft,"],
+    [52.0, "heh Ty i ja."],
+
+    [55.5, "Możemy zacząć od jutra,"],
+    [57.0, "Od dzisiaj, od teraz."],
+
+    [61.5, "Teraz uwaga, będzie najlepszy dźwięk,"],
+    [64.0, "Uwaga, słuchajcie."],
+
+    [75.0, "Uwielbiam go."]
+];
+
+const timedWords = [];
+
+lyrics.forEach(([startTime, line], index) => {
+    const words = line.split(/\s+/);
+
+    const nextTime = lyrics[index + 1]
+        ? lyrics[index + 1][0]
+        : startTime + 2;
+
+    const duration = nextTime - startTime;
+
+    const wordInterval = Math.min(
+        0.30,
+        duration / words.length
+    );
+
+    words.forEach((word, wordIndex) => {
+        timedWords.push({
+            time: startTime + wordIndex * wordInterval,
+            text: word
+        });
+    });
+});
+
+let lyricIndex = 0;
+let lyricsAnimation = null;
+let previousLyricTime = 0;
+
+
+function resumeTime() {
+    if (!timeFrozen) return;
+    timeFrozen = false;
+    lastHour = null;
+    countdown.classList.remove("frozen");
+    updateCountdown();
+}
+
+function freezeTime() {
+    if (timeFrozen) return;
+    updateCountdown();
+    timeFrozen = true;
+    countdown.classList.add("frozen");
+    if (reducedMotion) return;
+
+    const canvas = document.getElementById("timeCrack");
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width = window.innerWidth;
+    const h = canvas.height = window.innerHeight;
+    const rect = countdown.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const radius = Math.hypot(w, h);
+    const rays = [];
+    const count = 14;
+    for (let i = 0; i < count; i++) {
+        const angle = i * Math.PI * 2 / count + (Math.random() - .5) * .3;
+        const points = [[x, y]];
+        for (let j = 1; j <= 7; j++) {
+            const r = radius * Math.pow(j / 7, 1.5);
+            const a = angle + (Math.random() - .5) * .14;
+            points.push([x + Math.cos(a) * r, y + Math.sin(a) * r]);
+        }
+        rays.push(points);
+    }
+    function draw(points, width, opacity) {
+        ctx.beginPath();
+        points.forEach(([px, py], i) => i ? ctx.lineTo(px, py) : ctx.moveTo(px, py));
+        ctx.lineWidth = width + 2;
+        ctx.strokeStyle = "rgba(0,0,0,.65)";
+        ctx.stroke();
+        ctx.lineWidth = width;
+        ctx.strokeStyle = `rgba(235,245,255,${opacity})`;
+        ctx.stroke();
+    }
+    rays.forEach(points => draw(points, 1.2, .85));
+    for (let i = 0; i < count; i++) {
+        for (let j = 1; j <= 4; j++) {
+            if (Math.random() < .25) continue;
+            const a = rays[i][j];
+            const b = rays[(i + 1) % count][j];
+            draw([a, [(a[0]+b[0])/2 + (Math.random()-.5)*18, (a[1]+b[1])/2 + (Math.random()-.5)*18], b], .7, .65);
+        }
+    }
+    canvas.classList.add("active");
+}
+
+function spawnLyricWord(word) {
+    const element = document.createElement("span");
+
+    element.className = "lyric-word";
+    element.textContent = word;
+
+    const x = 15 + Math.random() * 70;
+    const y = 10 + Math.random() * 80;
+    const rotation = -12 + Math.random() * 24;
+    const fontSize = 24 + Math.random() * 36;
+
+    element.style.left = x + "%";
+    element.style.top = y + "%";
+
+    element.style.fontSize =
+        `clamp(18px, 5vw, ${fontSize}px)`;
+
+    element.style.setProperty(
+        "--rotation",
+        rotation + "deg"
+    );
+
+    lyricsContainer.appendChild(element);
+
+    element.addEventListener("animationend", () => {
+        element.remove();
+    }, { once: true });
+}
+
+function updateLyrics() {
+    if (
+        activeEasterEgg !== "sobieski" ||
+        sobieskiVideo.paused
+    ) {
+        stopLyrics();
+        return;
+    }
+
+    const currentTime = sobieskiVideo.currentTime;
+    setStageLights(currentTime >= 65.4 && currentTime < 109);
+    if (Number.isFinite(sobieskiVideo.duration) && currentTime >= sobieskiVideo.duration - 3) {
+        resumeTime();
+    }
+    if (currentTime >= 32.6 && previousLyricTime < 32.6 && currentTime < sobieskiVideo.duration - 3) {
+        freezeTime();
+    }
+
+    if (currentTime < previousLyricTime) {
+        lyricIndex = 0;
+        lyricsContainer.replaceChildren();
+    }
+
+    previousLyricTime = currentTime;
+
+    while (
+        lyricIndex < timedWords.length &&
+        currentTime >= timedWords[lyricIndex].time
+    ) {
+        if (
+            currentTime - timedWords[lyricIndex].time < 0.5
+        ) {
+            spawnLyricWord(
+                timedWords[lyricIndex].text
+            );
+        }
+
+        lyricIndex++;
+    }
+
+    lyricsAnimation = requestAnimationFrame(updateLyrics);
+}
+
+function startLyrics() {
+    stopLyrics();
+
+    lyricIndex = 0;
+    previousLyricTime = 0;
+
+    lyricsAnimation = requestAnimationFrame(updateLyrics);
+}
+
+function setStageLights(enabled) {
+    document.getElementById("stageLights").classList.toggle("active", enabled);
+    sobieskiVideo.classList.toggle("stage-lit", enabled);
+}
+
+function stopLyrics() {
+    setStageLights(false);
+    cancelAnimationFrame(lyricsAnimation);
+
+    lyricsAnimation = null;
+
+    lyricsContainer.replaceChildren();
+}
+
+sobieskiVideo.addEventListener("playing", startLyrics);
+sobieskiVideo.addEventListener("pause", stopLyrics);
+sobieskiVideo.addEventListener("ended", () => {
+    stopLyrics();
+    if (activeEasterEgg === "sobieski") stopEasterEgg();
+});
     </script>
 
 </body>
