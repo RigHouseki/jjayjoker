@@ -433,41 +433,6 @@
             transform: scale(1);
         }
 
-        @media (max-height: 650px) {
-            .video-wrapper {
-                width: min(90vw, calc((100dvh - 120px) * 16 / 9));
-            }
-
-            .countdown {
-                top: calc(100% + 15px);
-                font-size: 20px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .memorial,
-            .interference {
-                display: none;
-            }
-
-            .video.active,
-            .video.reveal {
-                animation: none;
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .video.corrupted {
-                animation: none;
-            }
-
-            .easter-egg,
-            .easter-egg img,
-            .countdown {
-                transition: none;
-            }
-        }
-    
         .bell-trigger {
             position: fixed;
             bottom: 0;
@@ -497,7 +462,9 @@
             height: 150vmax;
             border: 2px solid rgba(255,255,255,.22);
             border-radius: 50%;
-            box-shadow: 0 0 35px rgba(255,255,255,.12), inset 0 0 35px rgba(255,255,255,.12);
+            box-shadow:
+                0 0 35px rgba(255,255,255,.12),
+                inset 0 0 35px rgba(255,255,255,.12);
             opacity: 0;
         }
 
@@ -505,33 +472,137 @@
             animation: bellWave 3.2s ease-out both;
         }
 
-        .bell-resonance.active .bell-wave:nth-child(2) { animation-delay: .35s; }
-        .bell-resonance.active .bell-wave:nth-child(3) { animation-delay: .75s; }
+        .bell-resonance.active .bell-wave:nth-child(2) {
+            animation-delay: .35s;
+        }
+
+        .bell-resonance.active .bell-wave:nth-child(3) {
+            animation-delay: .75s;
+        }
 
         .video-wrapper.ringing {
             animation: bellShake 3.2s ease-out both;
         }
 
         @keyframes bellWave {
-            0% { transform: translate(-50%, -50%) scale(.03); opacity: 0; }
-            12% { opacity: .65; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+            0% {
+                transform: translate(-50%, -50%) scale(.03);
+                opacity: 0;
+            }
+
+            12% {
+                opacity: .65;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
         }
 
         @keyframes bellShake {
-            0%, 100% { transform: none; }
-            5% { transform: translateX(-3px) scale(1.008); }
-            10% { transform: translateX(3px) scale(1.006); }
-            17% { transform: translateX(-2px) scale(1.004); }
-            25% { transform: translateX(2px); }
-            38% { transform: translateX(-1px); }
-            55% { transform: translateX(1px); }
-            75% { transform: none; }
+            0%, 100% {
+                transform: none;
+            }
+
+            5% {
+                transform: translateX(-3px) scale(1.008);
+            }
+
+            10% {
+                transform: translateX(3px) scale(1.006);
+            }
+
+            17% {
+                transform: translateX(-2px) scale(1.004);
+            }
+
+            25% {
+                transform: translateX(2px);
+            }
+
+            38% {
+                transform: translateX(-1px);
+            }
+
+            55% {
+                transform: translateX(1px);
+            }
+
+            75% {
+                transform: none;
+            }
+        }
+
+        #ferretVideo {
+            position: fixed;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #ferretCanvas {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            max-width: 90vw;
+            height: auto;
+            z-index: 40;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #ferretCanvas.active {
+            opacity: 1;
+        }
+
+        @media (max-height: 650px) {
+            .video-wrapper {
+                width: min(
+                    90vw,
+                    calc((100dvh - 120px) * 16 / 9)
+                );
+            }
+
+            .countdown {
+                top: calc(100% + 15px);
+                font-size: 20px;
+            }
+
+            #ferretCanvas {
+                width: 300px;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .bell-resonance { display: none; }
-            .video-wrapper.ringing { animation: none; }
+            .memorial,
+            .interference,
+            .bell-resonance,
+            #ferretCanvas {
+                display: none;
+            }
+
+            .video.active,
+            .video.reveal {
+                animation: none;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .video.corrupted,
+            .video-wrapper.ringing {
+                animation: none;
+            }
+
+            .easter-egg,
+            .easter-egg img,
+            .countdown {
+                transition: none;
+            }
         }
     </style>
 </head>
@@ -572,8 +643,30 @@
         <div class="bell-wave"></div>
         <div class="bell-wave"></div>
     </div>
-    <button class="bell-trigger" id="bellTrigger" aria-label="Dzwon"></button>
-    <audio id="bellSound" src="./bell.mp3" preload="auto"></audio>
+
+    <button
+        class="bell-trigger"
+        id="bellTrigger"
+        aria-label="Dzwon">
+    </button>
+
+    <audio
+        id="bellSound"
+        src="./bell.mp3"
+        preload="auto">
+    </audio>
+
+    <video
+        id="ferretVideo"
+        src="./fred.mp4"
+        muted
+        loop
+        playsinline
+        preload="auto"
+        aria-hidden="true">
+    </video>
+
+    <canvas id="ferretCanvas" aria-hidden="true"></canvas>
 
     <!-- wpisz azirka -->
 
@@ -606,7 +699,6 @@
         const secondVideo = "I1hvlCCx2jI";
 
         const firstVideoDuration = 10000;
-
         const secretCode = "azirka";
 
         const targetDate = new Date(
@@ -642,20 +734,30 @@
         const bellTrigger = document.getElementById("bellTrigger");
         const bellResonance = document.getElementById("bellResonance");
         const videoWrapper = document.querySelector(".video-wrapper");
+
         bellSound.volume = 0.7;
+
         let bellTimer;
         let lastHour = null;
 
         function ringBell() {
             bellSound.pause();
             bellSound.currentTime = 0;
-            bellSound.play().catch(error => console.warn("Bell audio:", error));
+
+            bellSound.play().catch(error => {
+                console.warn("Bell audio:", error);
+            });
+
             bellResonance.classList.remove("active");
             videoWrapper.classList.remove("ringing");
+
             void bellResonance.offsetWidth;
+
             bellResonance.classList.add("active");
             videoWrapper.classList.add("ringing");
+
             clearTimeout(bellTimer);
+
             bellTimer = setTimeout(() => {
                 bellResonance.classList.remove("active");
                 videoWrapper.classList.remove("ringing");
@@ -663,6 +765,129 @@
         }
 
         bellTrigger.addEventListener("click", ringBell);
+
+        const ferretVideo = document.getElementById("ferretVideo");
+        const ferretCanvas = document.getElementById("ferretCanvas");
+
+        const ferretContext = ferretCanvas.getContext("2d", {
+            willReadFrequently: true
+        });
+
+        let ferretsStarted = false;
+        let lastFerretFrame = -1;
+
+        function renderFerrets() {
+            if (
+                ferretVideo.readyState >= 2 &&
+                ferretVideo.currentTime !== lastFerretFrame
+            ) {
+                lastFerretFrame = ferretVideo.currentTime;
+
+                ferretContext.drawImage(
+                    ferretVideo,
+                    0,
+                    0,
+                    ferretCanvas.width,
+                    ferretCanvas.height
+                );
+
+                const frame = ferretContext.getImageData(
+                    0,
+                    0,
+                    ferretCanvas.width,
+                    ferretCanvas.height
+                );
+
+                const pixels = frame.data;
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+
+                    const blueDifference = b - Math.max(r, g);
+
+                    const isBlue =
+                        b > 65 &&
+                        b > r * 1.2 &&
+                        b > g * 1.05;
+
+                    const isCyan =
+                        b > 80 &&
+                        g > 65 &&
+                        b > r * 1.3 &&
+                        g > r * 1.15;
+
+                    if (isBlue || isCyan) {
+                        pixels[i + 3] = 0;
+                    } else if (blueDifference > 10) {
+                        const transparency = Math.min(
+                            1,
+                            (blueDifference - 10) / 35
+                        );
+
+                        pixels[i + 3] = Math.round(
+                            255 * (1 - transparency)
+                        );
+
+                        pixels[i + 2] = Math.min(
+                            b,
+                            Math.max(r, g) + 10
+                        );
+                    }
+                }
+
+                ferretContext.putImageData(frame, 0, 0);
+
+                ferretCanvas.classList.add("active");
+            }
+
+            if ("requestVideoFrameCallback" in ferretVideo) {
+                ferretVideo.requestVideoFrameCallback(renderFerrets);
+            } else {
+                requestAnimationFrame(renderFerrets);
+            }
+        }
+
+        async function startFerrets() {
+            if (ferretsStarted || reducedMotion) return;
+
+            ferretsStarted = true;
+
+            try {
+                ferretVideo.muted = true;
+
+                await ferretVideo.play();
+
+                const scale = Math.min(
+                    1,
+                    640 / ferretVideo.videoWidth
+                );
+
+                ferretCanvas.width = Math.max(
+                    1,
+                    Math.round(ferretVideo.videoWidth * scale)
+                );
+
+                ferretCanvas.height = Math.max(
+                    1,
+                    Math.round(ferretVideo.videoHeight * scale)
+                );
+
+                renderFerrets();
+
+            } catch (error) {
+                ferretsStarted = false;
+
+                console.warn("Ferret video:", error);
+
+                document.addEventListener(
+                    "click",
+                    startFerrets,
+                    { once: true }
+                );
+            }
+        }
 
         function updateCountdown() {
             const remaining = Math.max(
@@ -672,10 +897,18 @@
 
             const totalSeconds = Math.ceil(remaining / 1000);
 
-            const hourBucket = Math.ceil(remaining / 3600000);
-            if (lastHour !== null && hourBucket < lastHour && countdown.classList.contains("active")) {
+            const hourBucket = Math.ceil(
+                remaining / 3600000
+            );
+
+            if (
+                lastHour !== null &&
+                hourBucket < lastHour &&
+                countdown.classList.contains("active")
+            ) {
                 ringBell();
             }
+
             lastHour = hourBucket;
 
             const days = Math.floor(totalSeconds / 86400);
@@ -693,7 +926,10 @@
 
         function showCountdown() {
             updateCountdown();
+
             countdown.classList.add("active");
+
+            startFerrets();
         }
 
         updateCountdown();
@@ -709,6 +945,7 @@
 
         function startFirstVideo() {
             loadVideo(firstVideo);
+
             videoContainer.classList.add("active");
 
             setTimeout(startGlitch, firstVideoDuration);
