@@ -57,6 +57,7 @@
         }
 
         .video.corrupted {
+            visibility: visible;
             animation: videoCorruption 1.2s linear forwards;
         }
 
@@ -466,19 +467,28 @@
         <img src="./x0sh4zx.jpg" alt="azirka">
     </div>
 
+    <audio
+        id="glitchSound"
+        src="./glitch%20sfx.mp3"
+        preload="auto">
+    </audio>
+
     <script>
         const youtubePlayer = document.getElementById("youtubePlayer");
         const videoContainer = document.getElementById("videoContainer");
         const interference = document.getElementById("interference");
         const easterEgg = document.getElementById("easterEgg");
         const secretTrigger = document.getElementById("secretTrigger");
+        const glitchSound = document.getElementById("glitchSound");
 
         const firstVideo = "fAlD0QLE76U";
         const secondVideo = "I1hvlCCx2jI";
 
-        const firstVideoDuration = 30000;
+        const firstVideoDuration = 10000;
 
         const secretCode = "azirka";
+
+        glitchSound.volume = 0.7;
 
         const reducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
@@ -504,6 +514,12 @@
                 return;
             }
 
+            glitchSound.currentTime = 0;
+
+            glitchSound.play().catch(error => {
+                console.warn("Glitch audio:", error);
+            });
+
             videoContainer.classList.remove("active");
             videoContainer.classList.add("corrupted");
             interference.classList.add("active");
@@ -523,6 +539,9 @@
             setTimeout(() => {
                 videoContainer.classList.remove("blackout");
                 videoContainer.classList.add("reveal");
+
+                glitchSound.pause();
+                glitchSound.currentTime = 0;
             }, 2000);
         }
 
