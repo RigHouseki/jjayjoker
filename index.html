@@ -28,7 +28,6 @@
             font-family: Georgia, serif;
         }
 
-        /* Symbol [*] */
 
         .memorial {
             position: fixed;
@@ -43,7 +42,6 @@
             animation: memorialFade 7s ease forwards;
         }
 
-        /* Odtwarzacz filmu */
 
         .video {
             width: 90%;
@@ -61,7 +59,6 @@
             border: none;
         }
 
-        /* Animacje */
 
         @keyframes memorialFade {
             0% {
@@ -91,7 +88,6 @@
             }
         }
 
-        /* Ukryty przycisk */
 
         .secret-trigger {
             position: fixed;
@@ -106,7 +102,6 @@
             touch-action: manipulation;
         }
 
-        /* Easter Egg */
 
         .easter-egg {
             position: fixed;
@@ -145,7 +140,6 @@
             transform: scale(1);
         }
 
-        /* Dostępność */
 
         @media (prefers-reduced-motion: reduce) {
             .memorial {
@@ -180,7 +174,7 @@
         </iframe>
     </div>
 
-    <!-- Ukryty przycisk -->
+    <!-- wpisz azirka -->
 
     <button
         class="secret-trigger"
@@ -188,7 +182,6 @@
         aria-label="azirkabo">
     </button>
 
-    <!-- Easter Egg -->
 
     <div class="easter-egg" id="easterEgg">
         <img src="./x0sh4zx.jpg" alt="azirka">
@@ -212,7 +205,6 @@
             easterEgg.classList.remove("active");
         }
 
-        // Pięć kliknięć w prawy dolny róg
 
         secretTrigger.addEventListener("click", () => {
             clicks++;
@@ -230,7 +222,7 @@
             }
         });
 
-        // Wpisanie sekretnego hasła
+        // wpisz azirka
 
         document.addEventListener("keydown", (event) => {
 
@@ -251,7 +243,6 @@
             }
         });
 
-        // Zamknięcie Easter Egga
 
         easterEgg.addEventListener("click", () => {
             hideEasterEgg();
