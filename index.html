@@ -61,6 +61,8 @@
             border: none;
         }
 
+        /* Animacje */
+
         @keyframes memorialFade {
             0% {
                 opacity: 0;
@@ -89,7 +91,7 @@
             }
         }
 
-        /* Ukryty obszar Easter Egga */
+        /* Ukryty przycisk */
 
         .secret-trigger {
             position: fixed;
@@ -100,6 +102,8 @@
             z-index: 10;
             background: transparent;
             border: none;
+            padding: 0;
+            touch-action: manipulation;
         }
 
         /* Easter Egg */
@@ -114,6 +118,7 @@
             z-index: 100;
             opacity: 0;
             visibility: hidden;
+            pointer-events: none;
             transition: opacity 1.5s ease,
                         visibility 1.5s;
         }
@@ -121,6 +126,7 @@
         .easter-egg.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
         .easter-egg img {
@@ -182,15 +188,17 @@
         aria-label="azirkabo">
     </button>
 
-    <!-- Zdjęcie psa -->
+    <!-- Easter Egg -->
 
     <div class="easter-egg" id="easterEgg">
-        <img src="x0sh4zx.jpg" alt="azirka">
+        <img src="./x0sh4zx.jpg" alt="azirka">
     </div>
 
     <script>
         const easterEgg = document.getElementById("easterEgg");
         const secretTrigger = document.getElementById("secretTrigger");
+
+        const secretCode = "azirka";
 
         let clicks = 0;
         let clickTimer;
@@ -218,30 +226,32 @@
             if (clicks >= 5) {
                 showEasterEgg();
                 clicks = 0;
+                clearTimeout(clickTimer);
             }
         });
 
-        // Wpisanie słowa "pies"
+        // Wpisanie sekretnego hasła
 
         document.addEventListener("keydown", (event) => {
 
             if (event.key === "Escape") {
                 hideEasterEgg();
+                typed = "";
                 return;
             }
 
             if (event.key.length === 1) {
                 typed += event.key.toLowerCase();
-                typed = typed.slice(-4);
+                typed = typed.slice(-secretCode.length);
 
-                if (typed === "azirka") {
+                if (typed === secretCode) {
                     showEasterEgg();
                     typed = "";
                 }
             }
         });
 
-        // Zamknięcie po kliknięciu zdjęcia
+        // Zamknięcie Easter Egga
 
         easterEgg.addEventListener("click", () => {
             hideEasterEgg();
