@@ -42,12 +42,33 @@
         }
 
         .video {
+            position: relative;
             width: 90%;
             max-width: 960px;
             aspect-ratio: 16 / 9;
             opacity: 0;
             visibility: hidden;
-            animation: videoFade 4s ease 6s forwards;
+            background: #000;
+        }
+
+        .video.active {
+            visibility: visible;
+            animation: videoFade 3s ease forwards;
+        }
+
+        .video.corrupted {
+            animation: videoCorruption 1.2s linear forwards;
+        }
+
+        .video.blackout {
+            opacity: 0;
+            visibility: hidden;
+            animation: none;
+        }
+
+        .video.reveal {
+            visibility: visible;
+            animation: crtStartup 0.6s ease forwards;
         }
 
         iframe {
@@ -55,6 +76,96 @@
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .interference {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .interference.active {
+            visibility: visible;
+            animation: interference 1.2s linear forwards;
+        }
+
+        .noise {
+            position: absolute;
+            inset: -30%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.35;
+        }
+
+        .interference.active .noise {
+            animation: noiseMovement 0.15s steps(3) infinite;
+        }
+
+        .scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 3px,
+                rgba(0, 0, 0, 0.5) 4px,
+                transparent 6px
+            );
+        }
+
+        .tracking {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            top: -100px;
+            background: linear-gradient(
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0.04),
+                transparent
+            );
+        }
+
+        .interference.active .tracking {
+            animation: trackingMovement 1s linear forwards;
+        }
+
+        .glitch-bar {
+            position: absolute;
+            width: 100%;
+            height: 18px;
+            opacity: 0;
+            background: rgba(200, 200, 200, 0.25);
+        }
+
+        .bar-one {
+            top: 22%;
+        }
+
+        .bar-two {
+            top: 48%;
+            height: 45px;
+        }
+
+        .bar-three {
+            top: 76%;
+            height: 8px;
+        }
+
+        .interference.active .glitch-bar {
+            animation: barGlitch 1s steps(1) forwards;
+        }
+
+        .interference.active .bar-two {
+            animation-delay: 0.1s;
+        }
+
+        .interference.active .bar-three {
+            animation-delay: 0.2s;
         }
 
         @keyframes memorialFade {
@@ -72,16 +183,176 @@
         }
 
         @keyframes videoFade {
+            from {
+                opacity: 0;
+                transform: scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes videoCorruption {
+            0% {
+                opacity: 1;
+                transform: none;
+                filter: none;
+            }
+
+            12% {
+                transform: translateX(-5px);
+                filter: contrast(1.3);
+            }
+
+            25% {
+                transform: translateX(12px) skewX(3deg);
+                filter: grayscale(0.6)
+                        drop-shadow(-5px 0 #ff003c)
+                        drop-shadow(5px 0 #00c8ff);
+            }
+
+            40% {
+                transform: translateX(-18px) scaleY(0.96);
+                filter: contrast(1.5) saturate(0.5);
+            }
+
+            55% {
+                transform: translateX(8px) skewX(-5deg);
+                filter: grayscale(1);
+                opacity: 0.8;
+            }
+
+            70% {
+                transform: scaleX(1.04) scaleY(0.8);
+                filter: grayscale(1) contrast(1.6);
+            }
+
+            85% {
+                transform: scaleX(1.1) scaleY(0.05);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes interference {
             0% {
                 opacity: 0;
-                visibility: visible;
-                transform: scale(0.97);
+            }
+
+            20% {
+                opacity: 0.2;
+            }
+
+            45% {
+                opacity: 0.45;
+            }
+
+            70% {
+                opacity: 0.65;
+            }
+
+            90% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes noiseMovement {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            25% {
+                transform: translate(-8%, 5%);
+            }
+
+            50% {
+                transform: translate(5%, -8%);
+            }
+
+            75% {
+                transform: translate(-5%, -5%);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        @keyframes trackingMovement {
+            from {
+                top: -100px;
+            }
+
+            to {
+                top: 110%;
+            }
+        }
+
+        @keyframes barGlitch {
+            0% {
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 0.6;
+                transform: translateX(-30px);
+            }
+
+            40% {
+                opacity: 0.2;
+                transform: translateX(25px);
+            }
+
+            60% {
+                opacity: 0.5;
+                transform: translateX(-10px);
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes crtStartup {
+            0% {
+                opacity: 0;
+                transform: scaleX(0.3) scaleY(0.005);
+                filter: grayscale(1);
+            }
+
+            20% {
+                opacity: 1;
+                transform: scaleX(1) scaleY(0.01);
+            }
+
+            45% {
+                transform: scaleX(1.02) scaleY(0.7);
+                filter: contrast(1.4) grayscale(0.8);
+            }
+
+            70% {
+                transform: scaleX(0.99) scaleY(1.01)
+                           translateX(-4px);
+            }
+
+            85% {
+                transform: translateX(3px);
             }
 
             100% {
                 opacity: 1;
-                visibility: visible;
-                transform: scale(1);
+                transform: none;
+                filter: none;
             }
         }
 
@@ -91,7 +362,7 @@
             right: 0;
             width: 60px;
             height: 60px;
-            z-index: 10;
+            z-index: 60;
             background: transparent;
             border: none;
             padding: 0;
@@ -136,14 +407,20 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .memorial {
+            .memorial,
+            .interference {
                 display: none;
             }
 
-            .video {
+            .video.active,
+            .video.reveal {
                 animation: none;
                 opacity: 1;
                 visibility: visible;
+            }
+
+            .video.corrupted {
+                animation: none;
             }
 
             .easter-egg,
@@ -158,7 +435,7 @@
 
     <div class="memorial">[*]</div>
 
-    <div class="video">
+    <div class="video" id="videoContainer">
         <iframe
             id="youtubePlayer"
             title="JJayJoker"
@@ -166,6 +443,15 @@
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen>
         </iframe>
+    </div>
+
+    <div class="interference" id="interference">
+        <div class="noise"></div>
+        <div class="scanlines"></div>
+        <div class="tracking"></div>
+        <div class="glitch-bar bar-one"></div>
+        <div class="glitch-bar bar-two"></div>
+        <div class="glitch-bar bar-three"></div>
     </div>
 
     <!-- wpisz azirka -->
@@ -182,8 +468,15 @@
 
     <script>
         const youtubePlayer = document.getElementById("youtubePlayer");
+        const videoContainer = document.getElementById("videoContainer");
+        const interference = document.getElementById("interference");
         const easterEgg = document.getElementById("easterEgg");
         const secretTrigger = document.getElementById("secretTrigger");
+
+        const firstVideo = "fAlD0QLE76U";
+        const secondVideo = "I1hvlCCx2jI";
+
+        const firstVideoDuration = 60000;
 
         const secretCode = "azirka";
 
@@ -191,9 +484,52 @@
             "(prefers-reduced-motion: reduce)"
         ).matches;
 
-        setTimeout(() => {
-            youtubePlayer.src = "https://www.youtube-nocookie.com/embed/fAlD0QLE76U?rel=0&autoplay=1&mute=0&playsinline=1";
-        }, reducedMotion ? 0 : 6000);
+        function loadVideo(videoID) {
+            youtubePlayer.src =
+                "https://www.youtube-nocookie.com/embed/" +
+                videoID +
+                "?rel=0&autoplay=1&mute=0&playsinline=1";
+        }
+
+        function startFirstVideo() {
+            loadVideo(firstVideo);
+            videoContainer.classList.add("active");
+
+            setTimeout(startGlitch, firstVideoDuration);
+        }
+
+        function startGlitch() {
+            if (reducedMotion) {
+                loadVideo(secondVideo);
+                return;
+            }
+
+            videoContainer.classList.remove("active");
+            videoContainer.classList.add("corrupted");
+            interference.classList.add("active");
+
+            setTimeout(() => {
+                videoContainer.classList.remove("corrupted");
+                videoContainer.classList.add("blackout");
+                interference.classList.remove("active");
+
+                youtubePlayer.src = "about:blank";
+            }, 1200);
+
+            setTimeout(() => {
+                loadVideo(secondVideo);
+            }, 1500);
+
+            setTimeout(() => {
+                videoContainer.classList.remove("blackout");
+                videoContainer.classList.add("reveal");
+            }, 2000);
+        }
+
+        setTimeout(
+            startFirstVideo,
+            reducedMotion ? 0 : 6000
+        );
 
         let clicks = 0;
         let clickTimer;
