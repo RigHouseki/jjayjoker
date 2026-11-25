@@ -41,10 +41,15 @@
             animation: memorialFade 7s ease forwards;
         }
 
-        .video {
+        .video-wrapper {
             position: relative;
             width: 90%;
             max-width: 960px;
+        }
+
+        .video {
+            position: relative;
+            width: 100%;
             aspect-ratio: 16 / 9;
             opacity: 0;
             visibility: hidden;
@@ -77,6 +82,27 @@
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .countdown {
+            position: absolute;
+            top: calc(100% + 25px);
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-family: Georgia, serif;
+            font-size: clamp(20px, 4vw, 32px);
+            letter-spacing: 4px;
+            font-variant-numeric: tabular-nums;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 3s ease;
+        }
+
+        .countdown.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         .interference {
@@ -407,6 +433,17 @@
             transform: scale(1);
         }
 
+        @media (max-height: 650px) {
+            .video-wrapper {
+                width: min(90vw, calc((100dvh - 120px) * 16 / 9));
+            }
+
+            .countdown {
+                top: calc(100% + 15px);
+                font-size: 20px;
+            }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .memorial,
             .interference {
@@ -425,7 +462,8 @@
             }
 
             .easter-egg,
-            .easter-egg img {
+            .easter-egg img,
+            .countdown {
                 transition: none;
             }
         }
@@ -436,14 +474,22 @@
 
     <div class="memorial">[*]</div>
 
-    <div class="video" id="videoContainer">
-        <iframe
-            id="youtubePlayer"
-            title="JJayJoker"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen>
-        </iframe>
+    <div class="video-wrapper">
+
+        <div class="video" id="videoContainer">
+            <iframe
+                id="youtubePlayer"
+                title="JJayJoker"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="countdown" id="countdown">
+            00:00:00:00
+        </div>
+
     </div>
 
     <div class="interference" id="interference">
@@ -480,6 +526,7 @@
         const easterEgg = document.getElementById("easterEgg");
         const secretTrigger = document.getElementById("secretTrigger");
         const glitchSound = document.getElementById("glitchSound");
+        const countdown = document.getElementById("countdown");
 
         const firstVideo = "fAlD0QLE76U";
         const secondVideo = "I1hvlCCx2jI";
@@ -488,11 +535,64 @@
 
         const secretCode = "azirka";
 
+        const targetDate = new Date(
+            "2026-12-06T00:00:00+01:00"
+        ).getTime();
+
         glitchSound.volume = 0.7;
+
+        let glitchStarted = false;
+
+        document.addEventListener("click", () => {
+            if (glitchStarted) return;
+
+            glitchSound.muted = true;
+
+            glitchSound.play().then(() => {
+                if (!glitchStarted) {
+                    glitchSound.pause();
+                    glitchSound.currentTime = 0;
+                }
+
+                glitchSound.muted = false;
+            }).catch(() => {
+                glitchSound.muted = false;
+            });
+        }, { once: true });
 
         const reducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
         ).matches;
+
+        function updateCountdown() {
+            const remaining = Math.max(
+                0,
+                targetDate - Date.now()
+            );
+
+            const totalSeconds = Math.ceil(remaining / 1000);
+
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor(totalSeconds / 3600) % 24;
+            const minutes = Math.floor(totalSeconds / 60) % 60;
+            const seconds = totalSeconds % 60;
+
+            countdown.textContent = [
+                days,
+                hours,
+                minutes,
+                seconds
+            ].map(n => String(n).padStart(2, "0")).join(":");
+        }
+
+        function showCountdown() {
+            updateCountdown();
+            countdown.classList.add("active");
+        }
+
+        updateCountdown();
+
+        setInterval(updateCountdown, 1000);
 
         function loadVideo(videoID) {
             youtubePlayer.src =
@@ -509,11 +609,15 @@
         }
 
         function startGlitch() {
+            glitchStarted = true;
+
             if (reducedMotion) {
                 loadVideo(secondVideo);
+                showCountdown();
                 return;
             }
 
+            glitchSound.muted = false;
             glitchSound.currentTime = 0;
 
             glitchSound.play().catch(error => {
@@ -542,6 +646,8 @@
 
                 glitchSound.pause();
                 glitchSound.currentTime = 0;
+
+                showCountdown();
             }, 2000);
         }
 
