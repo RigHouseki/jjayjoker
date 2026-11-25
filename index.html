@@ -36,11 +36,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-
             font-size: 48px;
             letter-spacing: 5px;
             opacity: 0;
-
             pointer-events: none;
             animation: memorialFade 7s ease forwards;
         }
@@ -51,10 +49,8 @@
             width: 90%;
             max-width: 960px;
             aspect-ratio: 16 / 9;
-
             opacity: 0;
             visibility: hidden;
-
             animation: videoFade 4s ease 6s forwards;
         }
 
@@ -65,18 +61,12 @@
             border: none;
         }
 
-        /* Pojawianie i znikanie symbolu */
-
         @keyframes memorialFade {
             0% {
                 opacity: 0;
             }
 
-            30% {
-                opacity: 1;
-            }
-
-            65% {
+            30%, 65% {
                 opacity: 1;
             }
 
@@ -84,8 +74,6 @@
                 opacity: 0;
             }
         }
-
-        /* Powolne pojawianie się filmu */
 
         @keyframes videoFade {
             0% {
@@ -101,6 +89,56 @@
             }
         }
 
+        /* Ukryty obszar Easter Egga */
+
+        .secret-trigger {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            z-index: 10;
+            background: transparent;
+            border: none;
+        }
+
+        /* Easter Egg */
+
+        .easter-egg {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease,
+                        visibility 1.5s;
+        }
+
+        .easter-egg.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .easter-egg img {
+            max-width: 90vw;
+            max-height: 85dvh;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 2s ease,
+                        transform 2s ease;
+            cursor: pointer;
+        }
+
+        .easter-egg.active img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         /* Dostępność */
 
         @media (prefers-reduced-motion: reduce) {
@@ -112,6 +150,11 @@
                 animation: none;
                 opacity: 1;
                 visibility: visible;
+            }
+
+            .easter-egg,
+            .easter-egg img {
+                transition: none;
             }
         }
     </style>
@@ -125,11 +168,85 @@
         <iframe
             src="https://www.youtube-nocookie.com/embed/fAlD0QLE76U?rel=0"
             title="JJayJoker"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen>
         </iframe>
     </div>
+
+    <!-- Ukryty przycisk -->
+
+    <button
+        class="secret-trigger"
+        id="secretTrigger"
+        aria-label="azirkabo">
+    </button>
+
+    <!-- Zdjęcie psa -->
+
+    <div class="easter-egg" id="easterEgg">
+        <img src="x0sh4zx.jpg" alt="azirka">
+    </div>
+
+    <script>
+        const easterEgg = document.getElementById("easterEgg");
+        const secretTrigger = document.getElementById("secretTrigger");
+
+        let clicks = 0;
+        let clickTimer;
+        let typed = "";
+
+        function showEasterEgg() {
+            easterEgg.classList.add("active");
+        }
+
+        function hideEasterEgg() {
+            easterEgg.classList.remove("active");
+        }
+
+        // Pięć kliknięć w prawy dolny róg
+
+        secretTrigger.addEventListener("click", () => {
+            clicks++;
+
+            clearTimeout(clickTimer);
+
+            clickTimer = setTimeout(() => {
+                clicks = 0;
+            }, 2000);
+
+            if (clicks >= 5) {
+                showEasterEgg();
+                clicks = 0;
+            }
+        });
+
+        // Wpisanie słowa "pies"
+
+        document.addEventListener("keydown", (event) => {
+
+            if (event.key === "Escape") {
+                hideEasterEgg();
+                return;
+            }
+
+            if (event.key.length === 1) {
+                typed += event.key.toLowerCase();
+                typed = typed.slice(-4);
+
+                if (typed === "azirka") {
+                    showEasterEgg();
+                    typed = "";
+                }
+            }
+        });
+
+        // Zamknięcie po kliknięciu zdjęcia
+
+        easterEgg.addEventListener("click", () => {
+            hideEasterEgg();
+        });
+    </script>
 
 </body>
 </html>
