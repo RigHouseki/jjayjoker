@@ -467,6 +467,72 @@
                 transition: none;
             }
         }
+    
+        .bell-trigger {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            z-index: 60;
+            background: transparent;
+            border: none;
+            padding: 0;
+            touch-action: manipulation;
+        }
+
+        .bell-resonance {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 55;
+        }
+
+        .bell-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150vmax;
+            height: 150vmax;
+            border: 2px solid rgba(255,255,255,.22);
+            border-radius: 50%;
+            box-shadow: 0 0 35px rgba(255,255,255,.12), inset 0 0 35px rgba(255,255,255,.12);
+            opacity: 0;
+        }
+
+        .bell-resonance.active .bell-wave {
+            animation: bellWave 3.2s ease-out both;
+        }
+
+        .bell-resonance.active .bell-wave:nth-child(2) { animation-delay: .35s; }
+        .bell-resonance.active .bell-wave:nth-child(3) { animation-delay: .75s; }
+
+        .video-wrapper.ringing {
+            animation: bellShake 3.2s ease-out both;
+        }
+
+        @keyframes bellWave {
+            0% { transform: translate(-50%, -50%) scale(.03); opacity: 0; }
+            12% { opacity: .65; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+
+        @keyframes bellShake {
+            0%, 100% { transform: none; }
+            5% { transform: translateX(-3px) scale(1.008); }
+            10% { transform: translateX(3px) scale(1.006); }
+            17% { transform: translateX(-2px) scale(1.004); }
+            25% { transform: translateX(2px); }
+            38% { transform: translateX(-1px); }
+            55% { transform: translateX(1px); }
+            75% { transform: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bell-resonance { display: none; }
+            .video-wrapper.ringing { animation: none; }
+        }
     </style>
 </head>
 
@@ -500,6 +566,14 @@
         <div class="glitch-bar bar-two"></div>
         <div class="glitch-bar bar-three"></div>
     </div>
+
+    <div class="bell-resonance" id="bellResonance" aria-hidden="true">
+        <div class="bell-wave"></div>
+        <div class="bell-wave"></div>
+        <div class="bell-wave"></div>
+    </div>
+    <button class="bell-trigger" id="bellTrigger" aria-label="Dzwon"></button>
+    <audio id="bellSound" src="./bell.mp3" preload="auto"></audio>
 
     <!-- wpisz azirka -->
 
@@ -564,6 +638,32 @@
             "(prefers-reduced-motion: reduce)"
         ).matches;
 
+        const bellSound = document.getElementById("bellSound");
+        const bellTrigger = document.getElementById("bellTrigger");
+        const bellResonance = document.getElementById("bellResonance");
+        const videoWrapper = document.querySelector(".video-wrapper");
+        bellSound.volume = 0.7;
+        let bellTimer;
+        let lastHour = null;
+
+        function ringBell() {
+            bellSound.pause();
+            bellSound.currentTime = 0;
+            bellSound.play().catch(error => console.warn("Bell audio:", error));
+            bellResonance.classList.remove("active");
+            videoWrapper.classList.remove("ringing");
+            void bellResonance.offsetWidth;
+            bellResonance.classList.add("active");
+            videoWrapper.classList.add("ringing");
+            clearTimeout(bellTimer);
+            bellTimer = setTimeout(() => {
+                bellResonance.classList.remove("active");
+                videoWrapper.classList.remove("ringing");
+            }, 4100);
+        }
+
+        bellTrigger.addEventListener("click", ringBell);
+
         function updateCountdown() {
             const remaining = Math.max(
                 0,
@@ -571,6 +671,12 @@
             );
 
             const totalSeconds = Math.ceil(remaining / 1000);
+
+            const hourBucket = Math.ceil(remaining / 3600000);
+            if (lastHour !== null && hourBucket < lastHour && countdown.classList.contains("active")) {
+                ringBell();
+            }
+            lastHour = hourBucket;
 
             const days = Math.floor(totalSeconds / 86400);
             const hours = Math.floor(totalSeconds / 3600) % 24;
