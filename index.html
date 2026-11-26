@@ -814,6 +814,33 @@
         @media (prefers-reduced-motion: reduce) {
             #stageLights.active, #stageLights.active .stage-beam { animation: none; }
         }
+#herobrineEyes {
+    position: fixed;
+    width: 38px;
+    height: 24px;
+    z-index: 44;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
+}
+
+#herobrineEyes.active {
+    display: flex;
+    animation: herobrineAppear 3s ease forwards;
+}
+
+.herobrine-eye {
+    width: 12px;
+    height: 6px;
+    background: #fff;
+    box-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+@keyframes herobrineAppear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
     </style>
 </head>
 
@@ -937,7 +964,12 @@
         src="./glitch%20sfx.mp3"
         preload="auto">
     </audio>
+<div id="herobrineEyes">
+    <div class="herobrine-eye"></div>
+    <div class="herobrine-eye"></div>
+</div>
 
+<audio id="caveSound" src="./cave.mp3" preload="auto"></audio>
     <script>
         const youtubePlayer = document.getElementById("youtubePlayer");
         const videoContainer = document.getElementById("videoContainer");
@@ -1707,6 +1739,87 @@ sobieskiVideo.addEventListener("ended", () => {
     stopLyrics();
     if (activeEasterEgg === "sobieski") stopEasterEgg();
 });
+const herobrineEyes = document.getElementById("herobrineEyes");
+const caveSound = document.getElementById("caveSound");
+
+caveSound.volume = 0.4;
+
+let herobrineTimer;
+
+function scheduleHerobrine() {
+    clearTimeout(herobrineTimer);
+
+    const delay = 30000 + Math.random() * 90000;
+
+    herobrineTimer = setTimeout(showHerobrine, delay);
+}
+
+function showHerobrine() {
+    if (
+        activeEasterEgg !== null ||
+        !countdown.classList.contains("active")
+    ) {
+        scheduleHerobrine();
+        return;
+    }
+
+    const rect = videoWrapper.getBoundingClientRect();
+    const positions = [];
+
+    if (rect.left > 65) {
+        positions.push({
+            x: 15 + Math.random() * (rect.left - 65),
+            y: 30 + Math.random() * (window.innerHeight - 120)
+        });
+    }
+
+    if (window.innerWidth - rect.right > 65) {
+        positions.push({
+            x: rect.right + 15 +
+                Math.random() * (window.innerWidth - rect.right - 65),
+            y: 30 + Math.random() * (window.innerHeight - 120)
+        });
+    }
+
+    if (rect.top > 60) {
+        positions.push({
+            x: 20 + Math.random() * (window.innerWidth - 80),
+            y: 15 + Math.random() * (rect.top - 50)
+        });
+    }
+
+    if (positions.length === 0) {
+        scheduleHerobrine();
+        return;
+    }
+
+    const position = positions[
+        Math.floor(Math.random() * positions.length)
+    ];
+
+    herobrineEyes.style.left = position.x + "px";
+    herobrineEyes.style.top = position.y + "px";
+
+    herobrineEyes.classList.add("active");
+}
+
+function scareHerobrine() {
+    if (!herobrineEyes.classList.contains("active")) return;
+
+    herobrineEyes.classList.remove("active");
+
+    caveSound.currentTime = 0;
+    caveSound.play().catch(error => {
+        console.warn("Cave sound:", error);
+    });
+
+    scheduleHerobrine();
+}
+
+herobrineEyes.addEventListener("mouseenter", scareHerobrine);
+herobrineEyes.addEventListener("click", scareHerobrine);
+
+scheduleHerobrine();
     </script>
 
 </body>
