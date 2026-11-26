@@ -1,5 +1,35 @@
 
 <!DOCTYPE html>
+<!--
+
+    Jeżeli badasz element i widzisz to to masz tutaj rzeczy które możesz robić na stronce
+    żółty magiczny guziczek
+
+    Fred
+        Kliknij biały pin na kapeluszu.
+
+    Sobieski i JJay
+        Kliknij żółty pin na kapeluszu.
+
+    Dzwon
+        Co godzine sie robi
+
+    Herobrine
+        Herobrine sie pojawia 
+
+    Tomba
+        Jak wpiszesz tomba to se biegnie Tomba z hitowej gry Tomba! lub TOMBI!! pojawia sie też sam z siebie. Wpisz tomba 5 razy szybko
+
+
+    Maraton MLP
+        Wpisz MLP lub Maraton to wtedy po obejrzeniu jak ctsg upada możesz se oglądać kucyki.
+
+
+    komendy:
+
+    skip - pominięcie intra lub animacji maratonu.
+
+-->
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +37,7 @@
     <title>JJayJoker</title>
     <link rel="icon" type="image/png" href="./czapka.png">
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -859,7 +890,16 @@
     from { transform: translateX(0); }
     to { transform: translateX(calc(100vw + 1px)); }
 }
-        </style>
+        
+#mlpCanvas { position:fixed; inset:0; width:100vw; height:100dvh; object-fit:contain; z-index:46; pointer-events:none; display:none; }
+#mlpCanvas.active { display:block; }
+#mlpVideo { position:fixed; width:1px; height:1px; opacity:0; pointer-events:none; }
+#mlpControls { position:absolute; top:calc(100% + 65px); width:100%; display:flex; justify-content:center; gap:12px; z-index:48; }
+#mlpControls[hidden] { display:none; }
+#mlpControls button { background:transparent; color:white; border:0; padding:6px; width:38px; height:38px; display:grid; place-items:center; cursor:pointer; transition:transform .18s ease, filter .18s ease; }
+#mlpControls button:hover, #mlpControls button:focus-visible { transform:scale(1.18); filter:drop-shadow(0 0 5px white); }
+#mlpControls button svg { width:24px; height:24px; }
+</style>
 </head>
 
 <body>
@@ -910,6 +950,11 @@
 
         </div>
 
+        <div id="mlpControls" hidden>
+<button id="mlpPrev" aria-label="Poprzedni odcinek" title="Poprzedni odcinek"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 6-6 6 6 6m8-12-6 6 6 6"/></svg></button>
+<button id="mlpExit" aria-label="Zakończ maraton" title="Zakończ maraton"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg></button>
+<button id="mlpNext" aria-label="Następny odcinek" title="Następny odcinek"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 6 6 6-6 6m8-12 6 6-6 6"/></svg></button>
+</div>
         <div class="countdown" id="countdown">
             00:00:00:00
         </div>
@@ -996,7 +1041,9 @@
     src="./tomba.mp3"
     preload="auto">
 </audio>
-    <script>
+    <video id="mlpVideo" src="./maraton.mp4" playsinline preload="metadata"></video>
+<canvas id="mlpCanvas" aria-hidden="true"></canvas>
+<script>
         const youtubePlayer = document.getElementById("youtubePlayer");
         const videoContainer = document.getElementById("videoContainer");
         const interference = document.getElementById("interference");
@@ -1185,6 +1232,7 @@
 
         function stopEasterEgg(restoreYoutube = true) {
             const wasActive = activeEasterEgg !== null;
+            if (activeEasterEgg === "mlp") { stopMlp(); return; }
             if (activeEasterEgg === "sobieski") resumeTime();
 
             playbackGeneration++;
@@ -1289,6 +1337,7 @@
         }
 
         async function toggleEasterEgg(type) {
+            if (activeEasterEgg === "mlp") stopMlp();
             if (activeEasterEgg === type) {
                 stopEasterEgg();
                 return;
@@ -1409,6 +1458,7 @@
         }
 
         function startFirstVideo() {
+            if (introSkipped) return;
             loadVideo(firstVideo);
 
             videoContainer.classList.add("active");
@@ -1420,6 +1470,7 @@
         }
 
         function startGlitch() {
+            if (introSkipped) return;
             glitchStarted = true;
 
             if (reducedMotion) {
@@ -1441,6 +1492,7 @@
             interference.classList.add("active");
 
             setTimeout(() => {
+                if (introSkipped) return;
                 videoContainer.classList.remove("corrupted");
                 videoContainer.classList.add("blackout");
 
@@ -1450,10 +1502,12 @@
             }, 1200);
 
             setTimeout(() => {
+                if (introSkipped) return;
                 loadVideo(secondVideo);
             }, 1500);
 
             setTimeout(() => {
+                if (introSkipped) return;
                 videoContainer.classList.remove("blackout");
                 videoContainer.classList.add("reveal");
 
@@ -1958,7 +2012,120 @@ setInterval(() => {
     if (!canSpawnTomba() && (tombaRunners.size || tombaSpawnTimers.size)) stopTomba();
 }, 200);
 scheduleTomba();
-    </script>
+    
+const mlpVideo = document.getElementById("mlpVideo");
+const mlpCanvas = document.getElementById("mlpCanvas");
+const mlpCtx = mlpCanvas.getContext("2d", {willReadFrequently:true});
+const mlpControls = document.getElementById("mlpControls");
+let mlpGeneration = 0;
+let mlpPlaylist = false;
+let mlpTyped = "";
+let mlpPreviousMuted = false;
+const mlpPlaylistId = "PLmIA7cwGNSUJdfq3w47gUhT0HyKHdm2DL";
+function stopMlp() {
+    if (activeEasterEgg !== "mlp") return;
+    ++mlpGeneration;
+    mlpVideo.pause();
+    mlpCanvas.classList.remove("active");
+    mlpControls.hidden = true;
+    activeEasterEgg = null;
+    if (mlpPlaylist) loadVideo(secondVideo);
+    else youtubeCommand(mlpPreviousMuted ? "mute" : "unMute");
+    mlpPlaylist = false;
+}
+function showMlpPlaylist() {
+    if (activeEasterEgg !== "mlp" || mlpPlaylist) return;
+    mlpPlaylist = true;
+    ++mlpGeneration;
+    mlpVideo.pause();
+    mlpCanvas.classList.remove("active");
+    youtubeVolumeApplied = false;
+    youtubePlayer.src = "https://www.youtube-nocookie.com/embed/videoseries?list=" + mlpPlaylistId + "&autoplay=1&controls=1&enablejsapi=1&playsinline=1" + (location.origin !== "null" ? "&origin=" + encodeURIComponent(location.origin) : "");
+    mlpControls.hidden = false;
+}
+function renderMlp(generation) {
+    if (generation !== mlpGeneration || activeEasterEgg !== "mlp" || mlpPlaylist) return;
+    if (mlpVideo.readyState >= 2) {
+        const w = mlpCanvas.width, h = mlpCanvas.height;
+        mlpCtx.drawImage(mlpVideo,0,0,w,h);
+        const frame = mlpCtx.getImageData(0,0,w,h), d = frame.data;
+        const seen = new Uint8Array(w*h), queue = new Int32Array(w*h);
+        let head=0, tail=0;
+        function add(i) {
+            if (seen[i]) return;
+            seen[i]=1;
+            const j=i*4, r=d[j], g=d[j+1], b=d[j+2];
+            const min=Math.min(r,g,b), max=Math.max(r,g,b);
+            if (max-min <= 15 && min >= (i >= w*h*.86 ? 65 : 225)) { queue[tail++]=i; d[j+3]=0; }
+        }
+        for(let x=0;x<w;x++){add(x);add((h-1)*w+x);}
+        for(let y=0;y<h;y++){add(y*w);add(y*w+w-1);}
+        while(head<tail){const i=queue[head++], x=i%w; if(x>0)add(i-1);if(x<w-1)add(i+1);if(i>=w)add(i-w);if(i<w*(h-1))add(i+w);}
+        mlpCtx.putImageData(frame,0,0);
+        mlpCanvas.classList.add("active");
+    }
+    if (mlpVideo.requestVideoFrameCallback) mlpVideo.requestVideoFrameCallback(()=>renderMlp(generation));
+    else requestAnimationFrame(()=>renderMlp(generation));
+}
+async function startMlp() {
+    if (!countdown.classList.contains("active")) return;
+    if (activeEasterEgg === "mlp") { stopMlp(); return; }
+    stopEasterEgg(); stopTomba(); hideEasterEgg();
+    mlpPreviousMuted = youtubeMuted;
+    activeEasterEgg = "mlp";
+    mlpPlaylist = false;
+    const generation = ++mlpGeneration;
+    youtubeCommand("mute");
+    mlpVideo.currentTime=0; mlpVideo.volume=.4;
+    try {
+        await mlpVideo.play();
+        if(generation!==mlpGeneration) return;
+        mlpCanvas.width=640; mlpCanvas.height=Math.round(640*mlpVideo.videoHeight/mlpVideo.videoWidth);
+        renderMlp(generation);
+    } catch(error) { if(generation===mlpGeneration){stopMlp();console.warn("MLP playback:",error);} }
+}
+mlpVideo.addEventListener("ended", showMlpPlaylist);
+mlpVideo.addEventListener("timeupdate",()=>{if(mlpVideo.currentTime>=88)showMlpPlaylist();});
+document.getElementById("mlpPrev").addEventListener("click",()=>youtubeCommand("previousVideo"));
+document.getElementById("mlpNext").addEventListener("click",()=>youtubeCommand("nextVideo"));
+document.getElementById("mlpExit").addEventListener("click",stopMlp);
+document.addEventListener("keydown",event=>{
+    if(event.key==="Escape"){mlpTyped="";return;}
+    if(event.repeat || event.key.length!==1)return;
+    mlpTyped=(mlpTyped+event.key.toLowerCase()).slice(-7);
+    if(mlpTyped.endsWith("mlp") || mlpTyped.endsWith("maraton")){mlpTyped="";startMlp();}
+});
+
+
+let introSkipped = false;
+let skipTyped = "";
+function skipCurrentVideo() {
+    if (activeEasterEgg === "mlp") {
+        if (!mlpPlaylist) showMlpPlaylist();
+        return;
+    }
+    if (countdown.classList.contains("active")) return;
+    introSkipped = true;
+    glitchStarted = true;
+    document.querySelector(".memorial").style.display = "none";
+    glitchSound.pause();
+    glitchSound.currentTime = 0;
+    interference.classList.remove("active");
+    videoContainer.classList.remove("corrupted", "blackout", "active");
+    loadVideo(secondVideo);
+    videoContainer.classList.add("reveal");
+    showCountdown();
+}
+document.addEventListener("keydown", event => {
+    if (event.repeat || event.key.length !== 1) return;
+    skipTyped = (skipTyped + event.key.toLowerCase()).slice(-4);
+    if (skipTyped === "skip") {
+        skipTyped = "";
+        skipCurrentVideo();
+    }
+});
+
+</script>
 
 </body>
 </html>
