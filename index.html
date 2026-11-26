@@ -841,35 +841,25 @@
     from { opacity: 0; }
     to { opacity: 1; }
 }
-#tombaRunner {
+#tombaContainer {
     position: fixed;
-    bottom: 10px;
-    left: 0;
-    width: 130px;
-    height: auto;
-    z-index: 43;
-    display: none;
+    inset: 0;
+    overflow: hidden;
     pointer-events: none;
+    z-index: 43;
+}
+.tomba-runner {
+    position: absolute;
+    left: 0;
+    height: auto;
     image-rendering: pixelated;
-}
-
-#tombaRunner.active {
-    display: block;
     animation: tombaRun 12s linear forwards;
-    will-change: transform;
 }
-
 @keyframes tombaRun {
-    from {
-        transform: translateX(-150px);
-    }
-
-    to {
-        transform: translateX(calc(100vw + 150px));
-    }
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 1px)); }
 }
-        
-    </style>
+        </style>
 </head>
 
 <body>
@@ -999,7 +989,7 @@
 
 <audio id="caveSound" src="./cave.mp3" preload="auto"></audio>
 
-<img id="tombaRunner" src="./tomba.gif" alt="Tomba">
+<div id="tombaContainer" aria-hidden="true"></div>
 
 <audio
     id="tombaMusic"
@@ -1857,121 +1847,116 @@ herobrineEyes.addEventListener("click", scareHerobrine);
 
 scheduleHerobrine();
 
-const tombaRunner = document.getElementById("tombaRunner");
+const tombaContainer = document.getElementById("tombaContainer");
 const tombaMusic = document.getElementById("tombaMusic");
-
+tombaMusic.volume = 0.4;
+tombaMusic.loop = true;
 let tombaTimer;
-let tombaActive = false;
-let tombaAnimation;
-let tombaStartTime;
+let tombaTyped = "";
+let tombaComboTimes = [];
+const tombaSpawnTimers = new Set();
+const tombaRunners = new Map();
 
-const tombaDuration = 12000;
-const tombaMaxVolume = 0.4;
-
-function scheduleTomba() {
-    clearTimeout(tombaTimer);
-
-    const delay = 120000 + Math.random() * 180000;
-
-    tombaTimer = setTimeout(startTomba, delay);
+function canSpawnTomba() {
+    return activeEasterEgg === null &&
+        countdown.classList.contains("active") &&
+        !easterEgg.classList.contains("active") && !document.hidden;
 }
 
-function startTomba() {
-    if (tombaActive) return;
-
-    if (
-        activeEasterEgg !== null ||
-        !countdown.classList.contains("active") ||
-        easterEgg.classList.contains("active") ||
-        document.hidden
-    ) {
-        scheduleTomba();
-        return;
+function syncTombaMusic() {
+    if (tombaRunners.size > 0) {
+        if (tombaMusic.paused) {
+            tombaMusic.play().catch(error => console.warn("Tomba music:", error));
+        }
+    } else {
+        tombaMusic.pause();
+        tombaMusic.currentTime = 0;
     }
-
-    clearTimeout(tombaTimer);
-
-    tombaActive = true;
-
-    tombaMusic.currentTime = 0;
-    tombaMusic.volume = 0;
-
-    tombaMusic.play().catch(error => {
-        console.warn("Tomba music:", error);
-    });
-
-    tombaRunner.classList.remove("active");
-
-    void tombaRunner.offsetWidth;
-
-    tombaRunner.classList.add("active");
-
-    tombaStartTime = performance.now();
-
-    updateTombaVolume(tombaStartTime);
 }
 
-function updateTombaVolume(now) {
-    if (!tombaActive) return;
-
-    if (
-        activeEasterEgg !== null ||
-        easterEgg.classList.contains("active") ||
-        document.hidden
-    ) {
-        stopTomba();
-        return;
+function spawnTomba(size = 130, duration = 12, bottom = 10) {
+    if (!canSpawnTomba()) return;
+    const runner = document.createElement("img");
+    runner.src = "./tomba.gif";
+    runner.alt = "";
+    runner.className = "tomba-runner";
+    runner.style.width = size + "px";
+    runner.style.bottom = bottom + "px";
+    runner.style.animationDuration = duration + "s";
+ //tomba jjayjoker idzie pozdro
+    function removeRunner() {
+        if (!tombaRunners.has(runner)) return;
+        clearTimeout(tombaRunners.get(runner));
+        tombaRunners.delete(runner);
+        runner.remove();
+        syncTombaMusic();
     }
+    runner.addEventListener("animationend", removeRunner, { once: true });
+    runner.addEventListener("error", removeRunner, { once: true });
+    tombaRunners.set(runner, setTimeout(removeRunner, duration * 1000 + 200));
+    tombaContainer.appendChild(runner);
+    syncTombaMusic();
+}
 
-    const progress = Math.min(
-        (now - tombaStartTime) / tombaDuration,
-        1
-    );
+function startTombaInvasion() {
 
-    tombaMusic.volume =
-        Math.sin(progress * Math.PI) * tombaMaxVolume;
-
-    if (progress >= 1) {
-        stopTomba();
-        return;
+    const count = Math.max(0, 30 - tombaRunners.size - tombaSpawnTimers.size);
+    for (let i = 0; i < count; i++) {
+        const timer = setTimeout(() => {
+            tombaSpawnTimers.delete(timer);
+            spawnTomba(60 + Math.random() * 140,
+                8 + Math.random() * 8, 10 + Math.random() * 70);
+        }, i * 120);
+        tombaSpawnTimers.add(timer);
     }
-
-    tombaAnimation = requestAnimationFrame(updateTombaVolume);
 }
 
 function stopTomba() {
-    tombaActive = false;
-
-    cancelAnimationFrame(tombaAnimation);
-
-    tombaRunner.classList.remove("active");
-
-    tombaMusic.pause();
-    tombaMusic.currentTime = 0;
-    tombaMusic.volume = 0;
-
-    scheduleTomba();
+    tombaSpawnTimers.forEach(timer => clearTimeout(timer));
+    tombaSpawnTimers.clear();
+    tombaRunners.forEach(timer => clearTimeout(timer));
+    tombaRunners.clear();
+    tombaContainer.replaceChildren();
+    tombaComboTimes = [];
+    tombaTyped = "";
+    syncTombaMusic();
 }
 
-let tombaTyped = "";
+function scheduleTomba() {
+    clearTimeout(tombaTimer);
+    tombaTimer = setTimeout(() => {
+        if (Math.random() < 0.35 && canSpawnTomba() &&
+            tombaRunners.size === 0 && tombaSpawnTimers.size === 0) {
+            spawnTomba();
+        }
+        scheduleTomba();
+    }, 120000 + Math.random() * 180000);
+}
 
 document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && tombaActive) {
-        stopTomba();
-        return;
-    }
-
-    if (event.key.length !== 1) return;
-
-    tombaTyped += event.key.toLowerCase();
-    tombaTyped = tombaTyped.slice(-5);
-
-    if (tombaTyped === "tomba") {
-        startTomba();
-        tombaTyped = "";
+    if (event.key === "Escape") { stopTomba(); return; }
+    if (event.repeat || event.key.length !== 1) return;
+    tombaTyped = (tombaTyped + event.key.toLowerCase()).slice(-5);
+    if (tombaTyped !== "tomba") return;
+    tombaTyped = "";
+    if (!canSpawnTomba()) return;
+    const now = Date.now();
+    tombaComboTimes = tombaComboTimes.filter(time => now - time <= 15000);
+    tombaComboTimes.push(now);
+    if (tombaComboTimes.length >= 5) {
+        tombaComboTimes = [];
+        startTombaInvasion();
+    } else {
+        spawnTomba();
     }
 });
 
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopTomba();
+});
+setInterval(() => {
+    if (!canSpawnTomba() && (tombaRunners.size || tombaSpawnTimers.size)) stopTomba();
+}, 200);
 scheduleTomba();
     </script>
 
